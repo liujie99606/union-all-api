@@ -16,4 +16,6 @@ public interface CommonConstants {
 
     String TRACE_ID = "X-App-Trace-Id";
 
+    String FOURTEEN_SENCOND = "PT50S";
+
 }
