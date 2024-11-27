@@ -99,7 +99,8 @@ mvn install:install-file -Dfile=你的文件路径/union-all-api/union-web/src/m
 <img src="images/%E6%8F%90%E7%8E%B0.jpg" alt="提现" width="250">
 
 ### 签到和余额
-![签到和余额.jpg](images/%E7%AD%BE%E5%88%B0%E5%92%8C%E4%BD%99%E9%A2%9D.jpg)
+<img src="images/%E7%AD%BE%E5%88%B0%E5%92%8C%E4%BD%99%E9%A2%9D.jpg" alt="签到和余额" width="250">
+
 
 ## 项目合作
 
@@ -120,5 +121,6 @@ mvn install:install-file -Dfile=你的文件路径/union-all-api/union-web/src/m
 - 运营支持服务
 
 如需项目合作，请联系微信：
-![微信号.jpg](images/%E5%BE%AE%E4%BF%A1%E5%8F%B7.jpg)
+<img src="images/%E5%BE%AE%E4%BF%A1%E5%8F%B7.jpg" alt="微信号" width="350">
+
 
