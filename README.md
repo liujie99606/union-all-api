@@ -93,9 +93,11 @@ mvn install:install-file -Dfile=你的文件路径/union-all-api/union-web/src/m
 
 ## 部分功能展示
 ### 查询返利
-![查询返利.jpg](images/%E6%9F%A5%E8%AF%A2%E8%BF%94%E5%88%A9.jpg)
+<img src="images/%E6%9F%A5%E8%AF%A2%E8%BF%94%E5%88%A9.jpg" alt="查询返利" width="250">
+
 ### 提现
-![提现.jpg](images/%E6%8F%90%E7%8E%B0.jpg)
+<img src="images/%E6%8F%90%E7%8E%B0.jpg" alt="提现" width="250">
+
 ### 签到和余额
 ![签到和余额.jpg](images/%E7%AD%BE%E5%88%B0%E5%92%8C%E4%BD%99%E9%A2%9D.jpg)
 
