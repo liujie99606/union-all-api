@@ -22,6 +22,7 @@ import com.jd.open.api.sdk.response.kplunion.UnionOpenOrderRowQueryResponse;
 import com.jd.open.api.sdk.response.kplunion.UnionOpenPromotionBysubunionidGetResponse;
 import com.union.base.exception.BaseException;
 import com.union.biz.dto.RebateGoodsDto;
+import com.union.config.properties.JdProperties;
 import com.union.utils.UserRateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,16 +34,16 @@ import java.util.List;
 @Slf4j
 @Service
 public class JdService {
-    private static final String SERVER_URL = "https://api.jd.com/routerjson";
-    private static final String appKey = "c0b127e386042fb9934cbef827a740f6";
-    private static final String appSecret = "203b509d889a4502951e641bbd999cc9";
-    private static final String siteId = "4101330087";
-    private static final JdClient client;
+    private final JdClient client;
 
-    static {
-        client = new DefaultJdClient(SERVER_URL, null, appKey, appSecret);
+    public JdService(JdProperties jdProperties) {
+        this.client = new DefaultJdClient(
+                jdProperties.getServerUrl(),
+                null,
+                jdProperties.getAppKey(),
+                jdProperties.getAppSecret()
+        );
     }
-
 
     /**
      * 网站/APP/流量媒体来获取的推广链接，功能同宙斯接口的自定义链接转换、 APP领取代码接口通过商品链接、活动链接获取普通推广链接
@@ -106,7 +107,7 @@ public class JdService {
 
     public List<OrderRowResp> getOrderRowInfo(String startTime, String endTime) {
         if (startTime == null || endTime == null) {
-            throw new BaseException( "startTime or endTime is null");
+            throw new BaseException("startTime or endTime is null");
         }
 
         List<OrderRowResp> result = new ArrayList<>();
@@ -129,17 +130,17 @@ public class JdService {
                 response = client.execute(request);
             } catch (Exception e) {
                 log.error("通过关键词搜索商品", e);
-                throw new BaseException( "同步订单失败");
+                throw new BaseException("同步订单失败");
             }
             if (response == null || response.getQueryResult() == null) {
                 log.info("查询推广订单及佣金信息,行查询,响应为空");
-                throw new BaseException( "同步订单失败");
+                throw new BaseException("同步订单失败");
             }
 
             OrderRowQueryResult queryResult = response.getQueryResult();
             if (queryResult.getCode() != 200) {
                 log.info("查询推广订单及佣金信息,行查询,异常,{}", response);
-                throw new BaseException( "同步订单失败");
+                throw new BaseException("同步订单失败");
             }
 
             OrderRowResp[] dataArr = queryResult.getData();
@@ -204,7 +205,7 @@ public class JdService {
 
 
     public static void main(String[] args) {
-        JdService jdService = new JdService();
+        JdService jdService = null;
 //        PromotionGoodsResp[] jdGoodsInfo = jdService.getJdGoodsInfo("100093436245");
 //        System.out.println(JSON.toJSONString(jdGoodsInfo));
 //        //{"platformType":"JD","url":"https://3.cn/26m-PqTu"}

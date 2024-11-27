@@ -8,9 +8,9 @@ import com.union.biz.dto.RebateGoodsDto;
 import com.union.biz.manager.UnionLinkManager;
 import com.union.biz.mapper.UnionUserMapper;
 import com.union.biz.model.UnionUserDO;
+import com.union.biz.service.platform.PddService;
 import com.union.enums.TextMessageTypeEnum;
 import com.union.utils.FreemarkerUtils;
-import com.union.utils.PddUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +28,9 @@ public class PddGoodsMessageStrategy extends GoodsMessageStrategy {
 
     @Resource
     private UnionUserMapper unionUserMapper;
+
+    @Resource
+    private PddService pddService;
 
     @Override
     public TextMessageTypeEnum getType() {
@@ -65,7 +68,7 @@ public class PddGoodsMessageStrategy extends GoodsMessageStrategy {
         }
         boolean isBindPdd = Optional.ofNullable(userDO.getIsBindPdd()).orElse(false);
         try {
-            RebateGoodsDto rebateGoodsDto = PddUtils.getPddUrl(text, userId, isBindPdd);
+            RebateGoodsDto rebateGoodsDto = pddService.getPddUrl(text, userId, isBindPdd);
             if (!isBindPdd) {
                 bindPdd(userId);
             }

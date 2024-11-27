@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.union.biz.dto.RebateGoodsDto;
 import com.union.biz.manager.UnionLinkManager;
-import com.union.biz.service.platform.TaobaoUtils;
+import com.union.biz.service.platform.TaobaoService;
 import com.union.enums.TextMessageTypeEnum;
 import com.union.utils.FreemarkerUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +20,9 @@ public class TaobaoGoodsMessageStrategy extends GoodsMessageStrategy {
 
     @Resource
     private UnionLinkManager unionLinkManager;
+
+    @Resource
+    private TaobaoService taobaoService;
 
     @Override
     public TextMessageTypeEnum getType() {
@@ -41,7 +44,7 @@ public class TaobaoGoodsMessageStrategy extends GoodsMessageStrategy {
 
     @Override
     public RebateGoodsDto getGoodsInfo(String text, String userId) {
-        RebateGoodsDto rebateGoodsDto = TaobaoUtils.getTKLByGoodsName(text);
+        RebateGoodsDto rebateGoodsDto = taobaoService.getTKLByGoodsName(text);
         if (rebateGoodsDto != null) {
             unionLinkManager.saveGoodsInfo(text, JSON.toJSONString(rebateGoodsDto), userId, getType(), rebateGoodsDto.getGoodsId());
         }

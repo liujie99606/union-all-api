@@ -69,3 +69,20 @@ knife4j:
     password: 017d0cbc5cbf4140aa81318c32ba55f1
 
 
+# JD配置
+jd:
+  server-url: https://api.jd.com/routerjson
+  app-key: xxx
+  app-secret: xxx
+
+# PDD配置
+pdd:
+  client-id: xxx
+  client-secret: xxx
+  pid: 41727667_295824328
+
+# 淘宝配置
+taobao:
+  app-key: xxx
+  secret: xxx
+  adzone-id: 115794850477

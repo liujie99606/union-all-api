@@ -21,9 +21,11 @@ import com.taobao.top.defaultability.request.TaobaoTbkDgMaterialOptionalUpgradeR
 import com.taobao.top.defaultability.response.TaobaoTbkDgMaterialOptionalUpgradeResponse;
 import com.union.base.exception.BaseException;
 import com.union.biz.dto.RebateGoodsDto;
+import com.union.config.properties.TaobaoProperties;
 import com.union.utils.TextUtils;
 import com.union.utils.UserRateUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,23 +35,25 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class TaobaoUtils {
+@Service
+public class TaobaoService {
 
-    private static final String appkey = "34859404";
-    private static final String secret = "df61f1619373a8faaf166758e41f0785";
-    private static final String url = "https://eco.taobao.com/router/rest";
+    private final TopApiClient client;
+    private final TaobaoProperties taobaoProperties;
 
-    private final static TopApiClient client = new DefaultTopApiClient(appkey, secret, url);
-
-    private TaobaoUtils() {
-        // 私有构造函数，防止实例化
+    public TaobaoService(TaobaoProperties taobaoProperties) {
+        this.taobaoProperties = taobaoProperties;
+        this.client = new DefaultTopApiClient(
+                taobaoProperties.getAppKey(),
+                taobaoProperties.getSecret(),
+                taobaoProperties.getServerUrl()
+        );
     }
-
 
     /**
      * 淘宝客-推广者-物料搜索升级版
      */
-    public static TaobaoTbkDgMaterialOptionalUpgradeMapData taobaoTbkDgMaterialOptionalUpgrade(String q) {
+    public TaobaoTbkDgMaterialOptionalUpgradeMapData taobaoTbkDgMaterialOptionalUpgrade(String q) {
         Defaultability apiPackage = new Defaultability(client);
         TaobaoTbkDgMaterialOptionalUpgradeRequest request = new TaobaoTbkDgMaterialOptionalUpgradeRequest();
         request.setGetTopnRate(0L);
@@ -92,7 +96,7 @@ public class TaobaoUtils {
     /**
      * 淘宝客-公用-淘口令生成
      */
-    public static TaobaoTbkTpwdCreateMapData getTKL(String url) {
+    public TaobaoTbkTpwdCreateMapData getTKL(String url) {
         Ability375 apiPackage = new Ability375(client);
 
         TaobaoTbkTpwdCreateRequest request = new TaobaoTbkTpwdCreateRequest();
@@ -113,8 +117,7 @@ public class TaobaoUtils {
     }
 
 
-
-    public static RebateGoodsDto getTKLByGoodsName(String taobaoGoodsName) {
+    public RebateGoodsDto getTKLByGoodsName(String taobaoGoodsName) {
         taobaoGoodsName = TextUtils.getTaobaoGoodsName(taobaoGoodsName);
         if (StrUtil.isBlank(taobaoGoodsName)) {
             log.info("商品名称获取为空");
@@ -169,9 +172,9 @@ public class TaobaoUtils {
         return null;
     }
 
-    public static List<TaobaoTbkOrderDetailsGetPublisherOrderDto> taobaoTbkOrderDetailsGet(String startTime, String endTime) {
+    public List<TaobaoTbkOrderDetailsGetPublisherOrderDto> taobaoTbkOrderDetailsGet(String startTime, String endTime) {
         if (startTime == null || endTime == null) {
-            throw new BaseException( "startTime or endTime is null");
+            throw new BaseException("startTime or endTime is null");
         }
         Ability414 apiPackage = new Ability414(client);
 
@@ -222,9 +225,8 @@ public class TaobaoUtils {
 //        RebateGoodsDto rebateGoodsDto = getTKLByGoodsName("【淘宝】http://e.tb.cn/h.T0HvP5B92ZsFN5t?tk=isKP3rHWI0H HU9196 「【百补】花王乐而雅卫生巾零触感特薄超长安心夜用组合姨妈巾32片」");
 //        log.info("tklByGoodsName:{}", JSON.toJSONString(rebateGoodsDto));
 //        TaobaoService taobaoUtils = new TaobaoService();
-        List<TaobaoTbkOrderDetailsGetPublisherOrderDto> result = TaobaoUtils.taobaoTbkOrderDetailsGet("2024-11-15 12:57:00", "2024-11-15 12:59:59");
-        System.out.println(JSON.toJSONString(result));
+//        List<TaobaoTbkOrderDetailsGetPublisherOrderDto> result = TaobaoUtils.taobaoTbkOrderDetailsGet("2024-11-15 12:57:00", "2024-11-15 12:59:59");
+//        System.out.println(JSON.toJSONString(result));
 
     }
-
-}
+} 

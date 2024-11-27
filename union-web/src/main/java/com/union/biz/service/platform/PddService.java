@@ -1,7 +1,6 @@
-package com.union.utils;
+package com.union.biz.service.platform;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
@@ -11,46 +10,37 @@ import com.pdd.pop.sdk.http.api.pop.request.*;
 import com.pdd.pop.sdk.http.api.pop.response.*;
 import com.union.base.exception.BaseException;
 import com.union.biz.dto.RebateGoodsDto;
+import com.union.config.properties.PddProperties;
+import com.union.utils.CurrencyConverter;
+import com.union.utils.TextUtils;
+import com.union.utils.UserRateUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-public class PddUtils {
+@Service
+public class PddService {
 
-    private static final String clientId = "0cb1df207c954250b75c122d088dde9c";
-    private static final String clientSecret = "cac00c6fa09e106269ca24132288a3e5a3a88dbc";
-    private static final String pid = "41727667_295824328";
-    //12345678
-    private static final String customParameters = "{\"uid\":\"%s\"}";
-    private static final String returnUrl = "查询失败！您未绑定拼多多\n" +
-            "------\n" +
-            "%s\n" +
-            "------\n" +
-            "①点击上方链接\n" +
-            "②确认授权\n" +
-            "③重新查询商品";
+    private final PopClient client;
+    private final PddProperties pddProperties;
 
-
-    //备案接口 https://jinbao.pinduoduo.com/qa-system?questionId=218
-    private static final PopClient client;
-
-    static {
-        client = new PopHttpClient(clientId, clientSecret);
+    public PddService(PddProperties pddProperties) {
+        this.pddProperties = pddProperties;
+        this.client = new PopHttpClient(pddProperties.getClientId(), pddProperties.getClientSecret());
     }
 
     /**
      * 转链
      */
-    public static PddDdkGoodsZsUnitUrlGenResponse.GoodsZsUnitGenerateResponse getLink(String url, String userId) {
+    public PddDdkGoodsZsUnitUrlGenResponse.GoodsZsUnitGenerateResponse getLink(String url, String userId) {
         PddDdkGoodsZsUnitUrlGenRequest request = new PddDdkGoodsZsUnitUrlGenRequest();
-        request.setCustomParameters(String.format(customParameters, userId));
+        request.setCustomParameters(String.format(pddProperties.getCustomParameters(), userId));
         request.setGenerateShortLink(false);
-        request.setPid(pid);
+        request.setPid(pddProperties.getPid());
         request.setSourceUrl(url);
         request.setGenerateWeAppLongLink(false);
         PddDdkGoodsZsUnitUrlGenResponse response = null;
@@ -67,10 +57,10 @@ public class PddUtils {
     /**
      * 查询是否绑定备案
      */
-    public static PddDdkMemberAuthorityQueryResponse.AuthorityQueryResponse getBindStatus(String userId) {
+    public PddDdkMemberAuthorityQueryResponse.AuthorityQueryResponse getBindStatus(String userId) {
         PddDdkMemberAuthorityQueryRequest request = new PddDdkMemberAuthorityQueryRequest();
-        request.setCustomParameters(String.format(customParameters, userId));
-        request.setPid(pid);
+        request.setCustomParameters(String.format(pddProperties.getCustomParameters(), userId));
+        request.setPid(pddProperties.getPid());
         PddDdkMemberAuthorityQueryResponse response = null;
         try {
             response = client.syncInvoke(request);
@@ -86,14 +76,14 @@ public class PddUtils {
     /**
      * 多多进宝推广链接生成
      */
-    public static PddDdkRpPromUrlGenerateResponse.RpPromotionUrlGenerateResponse getPddLink(String userId) {
+    public PddDdkRpPromUrlGenerateResponse.RpPromotionUrlGenerateResponse getPddLink(String userId) {
 
         PddDdkRpPromUrlGenerateRequest request = new PddDdkRpPromUrlGenerateRequest();
-        request.setCustomParameters(String.format(customParameters, userId));
+        request.setCustomParameters(String.format(pddProperties.getCustomParameters(), userId));
         request.setChannelType(10);
 
         List<String> pIdList = new ArrayList<>();
-        pIdList.add(pid);
+        pIdList.add(pddProperties.getPid());
         request.setPIdList(pIdList);
 
         PddDdkRpPromUrlGenerateResponse response = null;
@@ -110,10 +100,10 @@ public class PddUtils {
     /**
      * 多多进宝商品详情查询
      */
-    public static PddDdkGoodsDetailResponse.GoodsDetailResponseGoodsDetailsItem getGoodsDetail(String userId, String goodsSign) {
+    public PddDdkGoodsDetailResponse.GoodsDetailResponseGoodsDetailsItem getGoodsDetail(String userId, String goodsSign) {
         PddDdkGoodsDetailRequest request = new PddDdkGoodsDetailRequest();
-        request.setCustomParameters(String.format(customParameters, userId));
-        request.setPid(pid);
+        request.setCustomParameters(String.format(pddProperties.getCustomParameters(), userId));
+        request.setPid(pddProperties.getPid());
         request.setGoodsSign(goodsSign);
         PddDdkGoodsDetailResponse response;
         try {
@@ -133,16 +123,16 @@ public class PddUtils {
     /**
      * 多多进宝推广链接生成
      */
-    public static PddDdkGoodsPromotionUrlGenerateResponse.GoodsPromotionUrlGenerateResponseGoodsPromotionUrlListItem generateUrl(
+    public PddDdkGoodsPromotionUrlGenerateResponse.GoodsPromotionUrlGenerateResponseGoodsPromotionUrlListItem generateUrl(
             String userId, String goodsSign) {
         PddDdkGoodsPromotionUrlGenerateRequest request = new PddDdkGoodsPromotionUrlGenerateRequest();
-        request.setCustomParameters(String.format(customParameters, userId));
+        request.setCustomParameters(String.format(pddProperties.getCustomParameters(), userId));
 //        request.setGenerateShortUrl(true);
 
         List<String> goodsSignList = new ArrayList<>();
         goodsSignList.add(goodsSign);
         request.setGoodsSignList(goodsSignList);
-        request.setPId(pid);
+        request.setPId(pddProperties.getPid());
         PddDdkGoodsPromotionUrlGenerateResponse response = null;
         try {
             response = client.syncInvoke(request);
@@ -160,7 +150,7 @@ public class PddUtils {
     /**
      * 生成拼多多链接
      */
-    public static RebateGoodsDto getPddUrl(String url, String userId, boolean isBindPdd) {
+    public RebateGoodsDto getPddUrl(String url, String userId, boolean isBindPdd) {
         String noDiscountMsg = "该商品暂未设置优惠\n请换个商品试试";
 
         if (!isBindPdd) {
@@ -178,7 +168,7 @@ public class PddUtils {
                     throw new BaseException(noDiscountMsg);
                 }
                 String mobileUrl = generateResponse.getUrlList().get(0).getMobileUrl();
-                throw new BaseException(String.format(returnUrl, mobileUrl));
+                throw new BaseException(String.format(pddProperties.getReturnUrlTemplate(), mobileUrl));
             }
         }
 
@@ -236,18 +226,18 @@ public class PddUtils {
 
 
 //        generateUrl("E9D2L4u6vX9gRwXRweHeZFpjIzmvhALu_JQ4ATwUm3v");
-        LocalDateTime startTime = DateUtil.parseLocalDateTime("2024-11-18 16:38:00", "yyyy-MM-dd HH:mm:ss");
-        LocalDateTime endTime = DateUtil.parseLocalDateTime("2024-11-18 16:38:59", "yyyy-MM-dd HH:mm:ss");
-        List<PddDdkOrderListIncrementGetResponse.OrderListGetResponseOrderListItem> orderList = getOrderListIncrement(startTime.atZone(ZoneId.systemDefault()).toEpochSecond()
-                , endTime.atZone(ZoneId.systemDefault()).toEpochSecond());
-        System.out.println(JSON.toJSONString(orderList));
+//        LocalDateTime startTime = DateUtil.parseLocalDateTime("2024-11-18 16:38:00", "yyyy-MM-dd HH:mm:ss");
+//        LocalDateTime endTime = DateUtil.parseLocalDateTime("2024-11-18 16:38:59", "yyyy-MM-dd HH:mm:ss");
+//        List<PddDdkOrderListIncrementGetResponse.OrderListGetResponseOrderListItem> orderList = getOrderListIncrement(startTime.atZone(ZoneId.systemDefault()).toEpochSecond()
+//                , endTime.atZone(ZoneId.systemDefault()).toEpochSecond());
+//        System.out.println(JSON.toJSONString(orderList));
     }
 
     /**
      * 增量查询订单列表
      * 秒
      */
-    public static List<PddDdkOrderListIncrementGetResponse.OrderListGetResponseOrderListItem> getOrderListIncrement(Long startTime, Long endTime) {
+    public List<PddDdkOrderListIncrementGetResponse.OrderListGetResponseOrderListItem> getOrderListIncrement(Long startTime, Long endTime) {
         if (startTime == null || endTime == null) {
             throw new BaseException("startTime or endTime is null");
         }
@@ -289,4 +279,4 @@ public class PddUtils {
         }
         return result;
     }
-}
+} 

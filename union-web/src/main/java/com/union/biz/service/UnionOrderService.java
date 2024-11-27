@@ -20,7 +20,8 @@ import com.union.biz.mapper.UnionOrderMapper;
 import com.union.biz.mapper.UnionUserMapper;
 import com.union.biz.model.*;
 import com.union.biz.service.platform.JdService;
-import com.union.biz.service.platform.TaobaoUtils;
+import com.union.biz.service.platform.PddService;
+import com.union.biz.service.platform.TaobaoService;
 import com.union.biz.vo.AppOrderPageReqVO;
 import com.union.config.mybatis.PageResult;
 import com.union.enums.AccountTargetTypeEnum;
@@ -77,6 +78,12 @@ public class UnionOrderService extends ServiceImpl<UnionOrderMapper, UnionOrderD
     @Resource
     private MpMessageSendManager mpMessageSendManager;
 
+    @Resource
+    private PddService pddService;
+
+    @Resource
+    private TaobaoService taobaoService;
+
     @Value("${wechat.mp.app-id}")
     private String appId;
 
@@ -94,7 +101,7 @@ public class UnionOrderService extends ServiceImpl<UnionOrderMapper, UnionOrderD
     }
 
     public void taobaoOrderSync(String startTime, String endTime) {
-        List<TaobaoTbkOrderDetailsGetPublisherOrderDto> orderList = TaobaoUtils.taobaoTbkOrderDetailsGet(startTime, endTime);
+        List<TaobaoTbkOrderDetailsGetPublisherOrderDto> orderList = taobaoService.taobaoTbkOrderDetailsGet(startTime, endTime);
         if (CollUtil.isEmpty(orderList)) {
             log.info("没有拉取到淘宝订单数据");
             return;
@@ -134,7 +141,7 @@ public class UnionOrderService extends ServiceImpl<UnionOrderMapper, UnionOrderD
      * 同步拼多多订单
      */
     public void pddOrderSync(LocalDateTime startTime, LocalDateTime endTime) {
-        List<PddDdkOrderListIncrementGetResponse.OrderListGetResponseOrderListItem> orderList = PddUtils.getOrderListIncrement(
+        List<PddDdkOrderListIncrementGetResponse.OrderListGetResponseOrderListItem> orderList = pddService.getOrderListIncrement(
                 startTime.atZone(ZoneId.systemDefault()).toEpochSecond()
                 , endTime.atZone(ZoneId.systemDefault()).toEpochSecond());
         if (CollUtil.isEmpty(orderList)) {
@@ -256,7 +263,7 @@ public class UnionOrderService extends ServiceImpl<UnionOrderMapper, UnionOrderD
                     );
                     int i = unionOrderMapper.updateById(oldUnionOrderDO);
                     if (i < 1) {
-                        throw new BaseException( "结算失败");
+                        throw new BaseException("结算失败");
 
                     }
                 }
@@ -388,7 +395,7 @@ public class UnionOrderService extends ServiceImpl<UnionOrderMapper, UnionOrderD
             unionOrderDO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
             int i = unionOrderMapper.updateById(unionOrderDO);
             if (i < 1) {
-                throw new BaseException( "结算失败");
+                throw new BaseException("结算失败");
             }
             return;
         }
@@ -424,7 +431,7 @@ public class UnionOrderService extends ServiceImpl<UnionOrderMapper, UnionOrderD
         unionOrderDO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
         int i = unionOrderMapper.updateById(unionOrderDO);
         if (i < 1) {
-            throw new BaseException( "结算失败");
+            throw new BaseException("结算失败");
         }
         if (userRebateAmount.compareTo(BigDecimal.ZERO) > 0) {
             accountManager.income(userId, userRebateAmount,
@@ -440,7 +447,7 @@ public class UnionOrderService extends ServiceImpl<UnionOrderMapper, UnionOrderD
         String orderCode = OrderUtils.extractOrder(text);
         if (StrUtil.isBlank(orderCode)) {
             log.info("订单号不存在,{}", text);
-            throw new BaseException( "请回复有效订单");
+            throw new BaseException("请回复有效订单");
         }
         UnionOrderDO unionOrderDO = unionOrderMapper.selectOne(new LambdaQueryWrapper<UnionOrderDO>()
                 .eq(UnionOrderDO::getOrderCode, orderCode)
@@ -450,18 +457,18 @@ public class UnionOrderService extends ServiceImpl<UnionOrderMapper, UnionOrderD
         TextMessageTypeEnum platformType = OrderUtils.getPlatform(orderCode);
         if (platformType == null) {
             log.info("订单不存在2,{}", text);
-            throw new BaseException( "请回复有效订单");
+            throw new BaseException("请回复有效订单");
         }
 
         if (unionOrderDO == null) {
             log.info("订单不存在1,{}", text);
             String message = FreemarkerUtils.freeMarkerRender(null, "/textMessage/orderNotExits.txt");
-            throw new BaseException( message);
+            throw new BaseException(message);
         }
 
         // 如果订单已经绑定用户,不允许重复绑定
         if (unionOrderDO.getUserId() != null) {
-            throw new BaseException( "订单已被绑定,无法重复绑定");
+            throw new BaseException("订单已被绑定,无法重复绑定");
         }
     }
 
