@@ -120,7 +120,8 @@ mvn install:install-file -Dfile=你的文件路径/union-all-api/union-web/src/m
 - 数据统计分析
 - 运营支持服务
 
-如需项目合作，请联系微信：
+如需项目合作，请联系微信：备注来意
+
 <img src="images/%E5%BE%AE%E4%BF%A1%E5%8F%B7.jpg" alt="微信号" width="350">
 
 
