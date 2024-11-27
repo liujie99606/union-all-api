@@ -1,0 +1,71 @@
+# Spring配置
+spring:
+  # redis 配置
+  redis:
+    # 地址
+    host: localhost
+    # 端口，默认为6379
+    port: 6379
+    # 密码
+    password: admin
+    # 连接超时时间
+    timeout: 10s
+  # 数据源配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/union?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8&allowMultiQueries=true&nullCatalogMeansCurrent=true&allowPublicKeyRetrieval=true
+      username: admin
+      password: admin
+      # 配置检测连接是否有效
+      validationQuery: SELECT 1 FROM DUAL
+      statViewServlet:
+        enabled: true
+        # 设置白名单，不填则允许所有访问
+        allow:
+        url-pattern: /druid/*
+        # 控制台管理用户名和密码
+        login-username: union
+        login-password: 123456
+      filter:
+        stat:
+        # 慢SQL记录
+        log-slow-sql: true
+        slow-sql-millis: 1000
+        merge-sql: true
+      wall:
+        config:
+          multi-statement-allow: true
+
+# 微信配置
+wechat:
+  mp:
+    configs:
+      - appId: xxx # 第一个公众号的appid
+        secret: xxx # 公众号的appsecret
+        token: xxx # 接口配置里的Token值
+        aesKey: xxx # 接口配置里的EncodingAESKey值
+    app-id: xxx
+  pay:
+    appId: xxx
+    mchId: xxx
+    mchKey: xxx
+    keyPath: classpath:pay/apiclient_cert.p12
+    notifyUrl: http://x.com/app/user/wx-notify
+    serviceId:
+    payScoreNotifyUrl:
+    privateKeyPath: classpath:pay/apiclient_key.pem
+    privateCertPath: classpath:pay/apiclient_cert.pem
+    certSerialNo: xxx
+    apiV3Key: xxx
+
+
+knife4j:
+  enable: true
+  basic:
+    enable: true
+    username: admin
+    password: 017d0cbc5cbf4140aa81318c32ba55f1
+
+

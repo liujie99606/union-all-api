@@ -1,0 +1,83 @@
+# 项目配置
+union:
+  # 名称
+  name: 返利开发平台
+  # 版本
+  version: 3.0.0
+  #en_US 英语  zh_CN 简体中文
+  lang: zh_CN
+
+# 开发环境配置
+server:
+  # 服务端口
+  port: 8888
+  servlet:
+    # 项目contextPath
+    context-path: /
+
+# Spring配置
+spring:
+  # 序列化
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  profiles:
+    active: dev
+  # 文件上传
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 30MB
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher #解决报错 Failed to start bean 'documentationPluginsBootstrapper'
+
+# MyBatis Plus
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  typeAliasesPackage: com.union.biz.model
+  global-config:
+    # 不显示banner
+    banner: false
+    # 数据库相关配置
+    db-config:
+      #主键类型  AUTO:"数据库ID自增", INPUT:"用户输入ID",ID_WORKER:"全局唯一ID (数字类型唯一ID)", UUID:"全局唯一ID UUID";
+      id-type: ASSIGN_ID
+      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+  configuration:
+    call-setters-on-nulls: true
+
+# Sa-Token配置
+sa-token:
+  # 关闭Cookie模式
+  is-read-cookie: false
+  # token前缀
+  token-prefix: Bearer
+  # token名称 (同时也是cookie名称)
+  token-name: Authorization
+  timeout: 2592000
+
+# 防止XSS攻击
+xss:
+  # 过滤开关
+  enabled: true
+  # 排除链接（多个用逗号分隔）
+  excludes: /system/datasource/save,/system/datasource/update,/toolkit/dataset/*,/cms/article/*
+  # 匹配链接
+  urlPatterns: /system/*,/toolkit/*,/quartz/*,/activiti/*,/cms/*
+  # 不需要登录的接口
+  notLogin:
+    - /admin-api/test
+
+
+# 日志配置
+logging:
+  level:
+    com.union: debug
+    org.springframework: WARN
+    org.spring.springboot.dao: debug
+
+
+
+
