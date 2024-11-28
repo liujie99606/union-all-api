@@ -1,8 +1,8 @@
 package com.union.config;
 
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.models.auth.In;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -26,10 +26,9 @@ public class SwaggerConfig {
     @Bean
     public Docket productApi() {
         return new Docket(DocumentationType.OAS_30)
-//                .pathMapping("/dev-api")
                 .pathMapping("/")
                 .select()
-                .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
+                .apis(RequestHandlerSelectors.withMethodAnnotation(Operation.class))
                 .paths(PathSelectors.any())
                 .build()
                 .securityContexts(securityContexts())
@@ -41,7 +40,7 @@ public class SwaggerConfig {
      * 安全模式，这里指定token通过Authorization头请求头传递
      */
     private List<SecurityScheme> securitySchemes() {
-        List<SecurityScheme> apiKeyList = new ArrayList<SecurityScheme>();
+        List<SecurityScheme> apiKeyList = new ArrayList<>();
         apiKeyList.add(new ApiKey(HEADER, HEADER, In.HEADER.toValue()));
         return apiKeyList;
     }
@@ -82,7 +81,7 @@ public class SwaggerConfig {
                 // 描述
                 .description(GlobalConfig.getName() + "接口文档")
                 // 作者信息
-                .contact(new Contact("union", "http://www.union.com/", "1029861695@qq.com"))
+                .contact(new Contact("union", "http://www.union.com/", "1358620113@qq.com"))
                 // 版本
                 .version("版本号:" + GlobalConfig.getVersion())
                 .build();

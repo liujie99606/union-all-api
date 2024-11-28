@@ -55,6 +55,11 @@ public class SecurityUtil {
         return StpUtil.getLoginIdAsString();
     }
 
+    public Long getUserIdAsLong() {
+        String userId = StpUtil.getLoginIdAsString();
+        return StrUtil.isNotBlank(userId) ? Long.valueOf(userId) : null;
+    }
+
     public String getUserIdOrNull() {
         try {
             return Optional.ofNullable(StpUtil.getLoginIdDefaultNull())
