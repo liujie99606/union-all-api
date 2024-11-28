@@ -17,6 +17,8 @@ server:
 
 # Spring配置
 spring:
+  application:
+    name: union-server
   # 序列化
   jackson:
     time-zone: GMT+8
